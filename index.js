@@ -1,57 +1,48 @@
-const fs = require('node:fs');
-const http = require('http');
+import express from "express";
+import * as fs from 'fs';
 
-const server = http.createServer(function (req, res) {
-    if( req.method === 'GET')
-    {
-        switch(req.url)
-        {
-            case '/':
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                fs.readFile('./index.html', 'utf8', (err, data) => {
-                    if (err) {
-                      console.error(err);
-                      return;
-                    }
-                    res.end(data);
-                });
-                break;
-            case '/about':
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                fs.readFile('./about.html', 'utf8', (err, data) => {
-                    if (err) {
-                      console.error(err);
-                      return;
-                    }
-                    res.end(data);
-                });
-                break;
-            case '/contact-me':
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                fs.readFile('./contact-me.html', 'utf8', (err, data) => {
-                    if (err) {
-                      console.error(err);
-                      return;
-                    }
-                    res.end(data);
-                });
-                break;
-            default:
-                res.writeHead(404, {'Content-Type': 'text/html'});
-                fs.readFile('./404.html', 'utf8', (err, data) => {
-                    if (err) {
-                      console.error(err);
-                      return;
-                    }
-                    res.end(data);
-                });
-                break;
+const app = express();
+
+app.get("/", (req, res) => {
+    fs.readFile('./index.html', 'utf8', (err, data) => {
+        if (err) {
+          console.error(err);
+          return;
         }
-    } else {
-        res.writeHead(405, {'Content-Type': 'text/plain'});
-        res.end('Method Not Allowed\n');
-    }
+        res.send(data);
+    });
 });
 
-server.listen(8080);
-console.log('Server running');
+app.get("/about", (req, res) => {
+    fs.readFile('./about.html', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        res.send(data);
+    });
+});
+
+app.get("/contact-me", (req, res) => {
+    fs.readFile('./contact-me.html', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        res.send(data);
+    });
+});
+
+app.use((req, res, next) => {
+    fs.readFile('./404.html', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        res.status(404).send(data);
+    });
+});
+
+app.listen(8080, () => {
+    console.log('Server running');
+});
